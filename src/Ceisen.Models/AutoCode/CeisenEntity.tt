@@ -1,0 +1,50 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ include file="EF.Utility.CS.ttinclude"#>
+
+<#@ assembly name="System.Data.DataSetExtensions.dll" #>
+<#@ assembly name="MySql.Data"#>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="MySql.Data.MySqlClient" #>
+<#@ include file="$(SolutionDir)src\T4\manager.ttinclude" #>
+<#@ include file="$(SolutionDir)src\T4\DbHelper.ttinclude"  #>
+
+<# var manager = new Manager(Host, GenerationEnvironment, true) { OutputPath = Path.GetDirectoryName(Host.TemplateFile) }; #>
+<# foreach(Entity  entity in DbHelper.GetEntities(config.ConnectionString, new List<string>(){config.DbDatabase}))
+{   
+	string item = entity.EntityName;
+	manager.StartBlock(item+".cs");
+#>
+/**
+*┌──────────────────────────────────────────────────────────────┐
+*│　描    述：无                                                    
+*│　作    者：zhuhj                                              
+*│　版    本：1.0   模板代码自动生成                                              
+*│　创建时间：<#=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")#>                            
+*└──────────────────────────────────────────────────────────────┘
+*┌──────────────────────────────────────────────────────────────┐
+*│　命名空间：Ceisen.Models                                 
+*│　类    名：<#=item#>                                     
+*└──────────────────────────────────────────────────────────────┘
+*/
+
+using System;
+namespace Ceisen.Models
+{	
+    public partial class <#=item#>
+    {  
+<#
+        for(int i = 0; i < entity.Fields.Count; i++)
+        {
+#>        
+		/// <summary>
+        /// <#= entity.Fields[i].Name #>:<#= entity.Fields[i].Comment #>
+        /// </summary>
+        public <#= entity.Fields[i].Type #> <#= entity.Fields[i].Name #> { get; set; }
+<#}#>   
+
+    }
+}
+<# manager.EndBlock();
+}
+ manager.Process(true);#>
